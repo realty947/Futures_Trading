@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futures Risk Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6 flex items-center justify-center">
+        <div class="max-w-4xl w-full bg-white rounded-2xl shadow-xl p-8">
+            <div class="flex items-center gap-3 mb-8">
+                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="16" height="16" rx="2" stroke-width="2"></rect>
+                    <line x1="8" y1="8" x2="16" y2="8" stroke-width="2"></line>
+                    <line x1="8" y1="12" x2="16" y2="12" stroke-width="2"></line>
+                    <line x1="8" y1="16" x2="12" y2="16" stroke-width="2"></line>
+                </svg>
+                <h1 class="text-3xl font-bold text-gray-800">Futures Risk Calculator</h1>
+            </div>
+
+            <!-- Contract Selection -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-3">
+                    Select Contract Family
+                </label>
+                <div class="grid grid-cols-4 gap-3">
+                    <button onclick="selectContract('ES')" id="btn-ES" class="contract-btn p-4 rounded-lg text-center transition-all bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-gray-200">
+                        <div class="font-bold text-xl">ES</div>
+                        <div class="text-xs mt-1 opacity-70">S&P 500</div>
+                    </button>
+                    <button onclick="selectContract('NQ')" id="btn-NQ" class="contract-btn p-4 rounded-lg text-center transition-all bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-gray-200">
+                        <div class="font-bold text-xl">NQ</div>
+                        <div class="text-xs mt-1 opacity-70">Nasdaq-100</div>
+                    </button>
+                    <button onclick="selectContract('YM')" id="btn-YM" class="contract-btn p-4 rounded-lg text-center transition-all bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-gray-200">
+                        <div class="font-bold text-xl">YM</div>
+                        <div class="text-xs mt-1 opacity-70">Dow</div>
+                    </button>
+                    <button onclick="selectContract('GC')" id="btn-GC" class="contract-btn p-4 rounded-lg text-center transition-all bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-gray-200">
+                        <div class="font-bold text-xl">GC</div>
+                        <div class="text-xs mt-1 opacity-70">Gold</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tick Value Display -->
+            <div id="tickValueDisplay" class="hidden mb-6 bg-blue-50 rounded-lg p-4 border-2 border-blue-200">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-sm text-gray-600 mb-1">E-mini Point Value</div>
+                        <div id="miniTickValue" class="text-xl font-bold text-blue-600"></div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-600 mb-1">Micro Point Value</div>
+                        <div id="microTickValue" class="text-xl font-bold text-purple-600"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risk Calculation Method -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-3">
+                    Risk Calculation Method
+                </label>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="selectRiskMethod('dollar')" id="btn-dollar" class="risk-method-btn p-3 rounded-lg text-center transition-all bg-blue-600 text-white shadow-lg border-2 border-blue-600">
+                        <div class="font-semibold">Dollar Amount ($)</div>
+                    </button>
+                    <button onclick="selectRiskMethod('percent')" id="btn-percent" class="risk-method-btn p-3 rounded-lg text-center transition-all bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-gray-200">
+                        <div class="font-semibold">Percentage (%)</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Account Value Input (for percentage method) -->
+            <div id="accountValueSection" class="hidden mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Account Value ($)
+                </label>
+                <input
+                    type="number"
+                    id="accountValue"
+                    placeholder="e.g., 100000"
+                    class="w-full px-4 py-3 bg-gray-50 text-gray-800 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none"
+                />
+            </div>
+
+            <!-- Risk Percentage Input (for percentage method) -->
+            <div id="riskPercentSection" class="hidden mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Risk Percentage (%)
+                </label>
+                <input
+                    type="number"
+                    id="riskPercent"
+                    placeholder="e.g., 1"
+                    step="0.1"
+                    class="w-full px-4 py-3 bg-gray-50 text-gray-800 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none"
+                />
+            </div>
+
+            <!-- Risk Amount Input -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Risk Amount ($)
+                </label>
+                <input
+                    type="number"
+                    id="riskAmount"
+                    placeholder="e.g., 100"
+                    class="w-full px-4 py-3 bg-gray-50 text-gray-800 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none"
+                />
+            </div>
+
+            <!-- Stop Loss Input -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Stop Loss (Points)
+                </label>
+                <input
+                    type="number"
+                    id="stopLossPoints"
+                    placeholder="e.g., 10"
+                    class="w-full px-4 py-3 bg-gray-50 text-gray-800 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none"
+                />
+            </div>
+
+            <!-- Calculate Button -->
+            <div class="flex gap-3 mb-6">
+                <button
+                    id="calculateBtn"
+                    onclick="calculateContracts()"
+                    class="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors shadow-md"
+                >
+                    Calculate
+                </button>
+                <button
+                    onclick="reset()"
+                    class="px-6 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 rounded-lg transition-colors"
+                >
+                    Reset
+                </button>
+            </div>
+
+            <!-- Results Display -->
+            <div id="resultContainer" class="hidden space-y-4">
+                <!-- E-mini Result -->
+                <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-6 border-2 border-green-200 shadow-sm">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4" id="miniTitle"></h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Number of Contracts:</span>
+                            <span id="miniContracts" class="text-3xl font-bold text-green-600"></span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Risk per Contract:</span>
+                            <span id="miniRiskPerContract" class="text-gray-800 font-semibold"></span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Actual Total Risk:</span>
+                            <span id="miniActualRisk" class="text-gray-800 font-semibold"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Micro Result -->
+                <div class="bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg p-6 border-2 border-purple-200 shadow-sm">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4" id="microTitle"></h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Number of Contracts:</span>
+                            <span id="microContracts" class="text-3xl font-bold text-purple-600"></span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Risk per Contract:</span>
+                            <span id="microRiskPerContract" class="text-gray-800 font-semibold"></span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Actual Total Risk:</span>
+                            <span id="microActualRisk" class="text-gray-800 font-semibold"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const contractFamilies = {
+            'ES': {
+                mini: { id: 'ES', name: 'ES (E-mini S&P 500)', tickValue: 12.50, tickSize: 0.25 },
+                micro: { id: 'MES', name: 'MES (Micro ES)', tickValue: 1.25, tickSize: 0.25 }
+            },
+            'NQ': {
+                mini: { id: 'NQ', name: 'NQ (E-mini Nasdaq-100)', tickValue: 5.00, tickSize: 0.25 },
+                micro: { id: 'MNQ', name: 'MNQ (Micro NQ)', tickValue: 0.50, tickSize: 0.25 }
+            },
+            'YM': {
+                mini: { id: 'YM', name: 'YM (E-mini Dow)', tickValue: 5.00, tickSize: 1.0 },
+                micro: { id: 'MYM', name: 'MYM (Micro YM)', tickValue: 0.50, tickSize: 1.0 }
+            },
+            'GC': {
+                mini: { id: 'GC', name: 'GC (Gold futures)', tickValue: 10.00, tickSize: 0.10 },
+                micro: { id: 'MGC', name: 'MGC (Micro Gold)', tickValue: 1.00, tickSize: 0.10 }
+            }
+        };
+
+        let selectedFamily = '';
+        let riskMethod = 'dollar';
+
+        function selectContract(family) {
+            selectedFamily = family;
+            
+            document.querySelectorAll('.contract-btn').forEach(btn => {
+                btn.className = 'contract-btn p-4 rounded-lg text-center transition-all bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-gray-200';
+            });
+            document.getElementById(`btn-${family}`).className = 'contract-btn p-4 rounded-lg text-center transition-all bg-blue-600 text-white shadow-lg scale-105 border-2 border-blue-600';
+            
+            const selectedContracts = contractFamilies[family];
+            const miniPointValue = selectedContracts.mini.tickValue / selectedContracts.mini.tickSize;
+            const microPointValue = selectedContracts.micro.tickValue / selectedContracts.micro.tickSize;
+            document.getElementById('miniTickValue').textContent = `${miniPointValue.toFixed(2)} per point`;
+            document.getElementById('microTickValue').textContent = `${microPointValue.toFixed(2)} per point`;
+            document.getElementById('tickValueDisplay').classList.remove('hidden');
+            
+            updateCalculateButton();
+        }
+
+        function selectRiskMethod(method) {
+            riskMethod = method;
+            
+            document.querySelectorAll('.risk-method-btn').forEach(btn => {
+                btn.className = 'risk-method-btn p-3 rounded-lg text-center transition-all bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-gray-200';
+            });
+            document.getElementById(`btn-${method}`).className = 'risk-method-btn p-3 rounded-lg text-center transition-all bg-blue-600 text-white shadow-lg border-2 border-blue-600';
+            
+            if (method === 'percent') {
+                document.getElementById('accountValueSection').classList.remove('hidden');
+                document.getElementById('riskPercentSection').classList.remove('hidden');
+                document.getElementById('riskAmount').parentElement.classList.add('hidden');
+            } else {
+                document.getElementById('accountValueSection').classList.add('hidden');
+                document.getElementById('riskPercentSection').classList.add('hidden');
+                document.getElementById('riskAmount').parentElement.classList.remove('hidden');
+            }
+            
+            updateCalculateButton();
+        }
+
+        function updateCalculateButton() {
+            const calculateBtn = document.getElementById('calculateBtn');
+            const stopLossPoints = document.getElementById('stopLossPoints').value;
+            
+            let canCalculate = false;
+            
+            if (riskMethod === 'dollar') {
+                const riskAmount = document.getElementById('riskAmount').value;
+                canCalculate = selectedFamily && riskAmount && stopLossPoints;
+            } else {
+                const accountValue = document.getElementById('accountValue').value;
+                const riskPercent = document.getElementById('riskPercent').value;
+                canCalculate = selectedFamily && accountValue && riskPercent && stopLossPoints;
+            }
+            
+            calculateBtn.disabled = !canCalculate;
+        }
+
+        function calculateResult(contract, risk, stopLoss) {
+            const ticksInStopLoss = stopLoss / contract.tickSize;
+            const riskPerContract = ticksInStopLoss * contract.tickValue;
+            const numberOfContracts = Math.floor(risk / riskPerContract);
+            const actualRisk = numberOfContracts * riskPerContract;
+
+            return {
+                contracts: numberOfContracts,
+                riskPerContract: riskPerContract.toFixed(2),
+                actualRisk: actualRisk.toFixed(2),
+                contractName: contract.name
+            };
+        }
+
+        function calculateContracts() {
+            let riskAmount;
+            const stopLossPoints = parseFloat(document.getElementById('stopLossPoints').value);
+
+            if (!selectedFamily || !stopLossPoints) {
+                return;
+            }
+
+            if (riskMethod === 'dollar') {
+                riskAmount = parseFloat(document.getElementById('riskAmount').value);
+                if (!riskAmount) return;
+            } else {
+                const accountValue = parseFloat(document.getElementById('accountValue').value);
+                const riskPercent = parseFloat(document.getElementById('riskPercent').value);
+                if (!accountValue || !riskPercent) return;
+                riskAmount = (accountValue * riskPercent) / 100;
+            }
+
+            const family = contractFamilies[selectedFamily];
+            
+            const miniResult = calculateResult(family.mini, riskAmount, stopLossPoints);
+            document.getElementById('miniTitle').textContent = family.mini.name;
+            document.getElementById('miniContracts').textContent = miniResult.contracts;
+            document.getElementById('miniRiskPerContract').textContent = `$${miniResult.riskPerContract}`;
+            document.getElementById('miniActualRisk').textContent = `$${miniResult.actualRisk}`;
+
+            const microResult = calculateResult(family.micro, riskAmount, stopLossPoints);
+            document.getElementById('microTitle').textContent = family.micro.name;
+            document.getElementById('microContracts').textContent = microResult.contracts;
+            document.getElementById('microRiskPerContract').textContent = `$${microResult.riskPerContract}`;
+            document.getElementById('microActualRisk').textContent = `$${microResult.actualRisk}`;
+
+            document.getElementById('resultContainer').classList.remove('hidden');
+        }
+
+        function reset() {
+            selectedFamily = '';
+            riskMethod = 'dollar';
+            document.getElementById('riskAmount').value = '';
+            document.getElementById('accountValue').value = '';
+            document.getElementById('riskPercent').value = '';
+            document.getElementById('stopLossPoints').value = '';
+            document.getElementById('resultContainer').classList.add('hidden');
+            document.getElementById('tickValueDisplay').classList.add('hidden');
+            
+            document.querySelectorAll('.contract-btn').forEach(btn => {
+                btn.className = 'contract-btn p-4 rounded-lg text-center transition-all bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-gray-200';
+            });
+            
+            document.querySelectorAll('.risk-method-btn').forEach(btn => {
+                btn.className = 'risk-method-btn p-3 rounded-lg text-center transition-all bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-gray-200';
+            });
+            document.getElementById('btn-dollar').className = 'risk-method-btn p-3 rounded-lg text-center transition-all bg-blue-600 text-white shadow-lg border-2 border-blue-600';
+            
+            document.getElementById('accountValueSection').classList.add('hidden');
+            document.getElementById('riskPercentSection').classList.add('hidden');
+            document.getElementById('riskAmount').parentElement.classList.remove('hidden');
+            
+            updateCalculateButton();
+        }
+
+        document.getElementById('riskAmount').addEventListener('input', updateCalculateButton);
+        document.getElementById('accountValue').addEventListener('input', updateCalculateButton);
+        document.getElementById('riskPercent').addEventListener('input', updateCalculateButton);
+        document.getElementById('stopLossPoints').addEventListener('input', updateCalculateButton);
+
+        updateCalculateButton();
+    </script>
+</body>
+</html>
