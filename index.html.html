@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Day Checklist</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .date {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .section {
+            padding: 25px 30px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-icon {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .checklist-item:hover {
+            background: #f8f9ff;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            margin-right: 15px;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .checklist-item label {
+            cursor: pointer;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+            flex: 1;
+        }
+
+        .checklist-item input[type="checkbox"]:checked + label {
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .reset-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 20px 30px 30px;
+            width: calc(100% - 60px);
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .reset-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .reset-button:active {
+            transform: translateY(0);
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 0 30px 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Trading Day Checklist</h1>
+            <div class="date" id="currentDate"></div>
+        </div>
+
+        <div class="progress-text" id="progressText">0 of 0 completed</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">🌅</span>
+                Morning Setup Rules
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="setup1">
+                <label for="setup1">Mark Session based liquidity</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="setup2">
+                <label for="setup2">Mark previous day high/low</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="setup3">
+                <label for="setup3">Mark weekly high/low</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="setup4">
+                <label for="setup4">Identify Bias w/ HTF / SMT / MMXM</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="setup5">
+                <label for="setup5">Identify HTF footprints</label>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">⚡</span>
+                Execution Rules
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="exec1">
+                <label for="exec1">Look for IFVG + lack of displacement from session liquidity</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="exec2">
+                <label for="exec2">Stop: Below lack of displacement candle + 2 points</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="exec3">
+                <label for="exec3">Risk not more than 10% of max drawdown / 1% of the account</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="exec4">
+                <label for="exec4">Target: 2:1 RR only</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="exec5">
+                <label for="exec5">Max trades: 1 Win or 2 loss</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="exec6">
+                <label for="exec6">No trading 30 minutes before/after major news</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="exec7">
+                <label for="exec7">Trade only 9:30 AM - 12:00 PM</label>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">📝</span>
+                Journal Rules
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="journal1">
+                <label for="journal1">Screenshot every setup (win or lose)</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="journal2">
+                <label for="journal2">Log: Date, time, Entry price, Stop price, Target price, Result, amount</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="journal3">
+                <label for="journal3">Rate setup quality 1-10</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="journal4">
+                <label for="journal4">Write one sentence about market conditions</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="journal5">
+                <label for="journal5">Calculate actual RR achieved</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="journal6">
+                <label for="journal6">Track daily P&L in points</label>
+            </div>
+        </div>
+
+        <button class="reset-button" onclick="resetChecklist()">Reset Checklist</button>
+    </div>
+
+    <script>
+        // Display current date
+        const dateEl = document.getElementById('currentDate');
+        const today = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateEl.textContent = today.toLocaleDateString('en-US', options);
+
+        // Get all checkboxes
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+
+        // Load saved state
+        function loadState() {
+            checkboxes.forEach(checkbox => {
+                const saved = localStorage.getItem(checkbox.id);
+                if (saved === 'true') {
+                    checkbox.checked = true;
+                }
+            });
+            updateProgress();
+        }
+
+        // Save state
+        function saveState() {
+            checkboxes.forEach(checkbox => {
+                localStorage.setItem(checkbox.id, checkbox.checked);
+            });
+            updateProgress();
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const total = checkboxes.length;
+            const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
+            const percentage = (checked / total) * 100;
+            
+            progressFill.style.width = percentage + '%';
+            progressText.textContent = `${checked} of ${total} completed`;
+        }
+
+        // Add event listeners
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', saveState);
+        });
+
+        // Reset function
+        function resetChecklist() {
+            if (confirm('Are you sure you want to reset all checkboxes?')) {
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                    localStorage.removeItem(checkbox.id);
+                });
+                updateProgress();
+            }
+        }
+
+        // Load state on page load
+        loadState();
+    </script>
+</body>
+</html>
